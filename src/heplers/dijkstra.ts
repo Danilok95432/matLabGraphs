@@ -1,5 +1,3 @@
-// dijkstra.ts
-
 import { Edge } from "../types/Edge"
 import { NodeType } from "../types/Node"
 import { DijkstraResult } from "../types/Result"

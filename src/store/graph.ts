@@ -32,21 +32,15 @@ export const graphSlice = createSlice({
     deleteNode: (state, action: PayloadAction<string>) => {
       const nodeIdToDelete = action.payload;
       let deleteInd = -1;
-
-      // Поиск индекса удаляемого узла
       state.nodes.forEach((node, index) => {
         if (node.title === nodeIdToDelete) {
           deleteInd = index;
         }
       });
-
-      // Удаление ребер, связанных с удаляемым узлом
       state.edges = state.edges.filter(
         (edge) =>
           edge.source !== nodeIdToDelete && edge.target !== nodeIdToDelete
       );
-
-      // Удаление узла, если он был найден
       if (deleteInd !== -1) {
         state.nodes.splice(deleteInd, 1);
       }
