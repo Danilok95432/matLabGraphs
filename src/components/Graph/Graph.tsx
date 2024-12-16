@@ -23,7 +23,7 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
   const isDirected = useSelector((state: RootState) => state.graph.isDirected)
 
   const handleAddNodes = () => {
-    const title = prompt("Введите название новой ноды:");
+    const title = prompt("Введите название новой вершины:");
     if (title) {
       const newNode: NodeType = {
         id: Date.now().toString(),
@@ -39,8 +39,8 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
   }
 
   const handleAddEdges = () => {
-    const source = prompt("Введите имя начальной ноды:");
-    const target = prompt("Введите имя конечной ноды:");
+    const source = prompt("Введите имя начальной вершины:");
+    const target = prompt("Введите имя конечной вершины:");
     const weightStr = prompt("Введите вес ребра:");
 
     if (source && target && weightStr) {
@@ -60,8 +60,8 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
   }
 
   const handleFindRoute = () => {
-    const start = prompt("Введите имя начальной ноды:");
-    const end = prompt("Введите имя конечной ноды:");
+    const start = prompt("Введите имя начальной вершины:");
+    const end = prompt("Введите имя конечной вершины:");
     if (start != null && end != null) {
       setResult(dijkstra(initialNodes, initialEdges, start, end, isDirected))
     }
@@ -79,7 +79,7 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
     <>
       <div className={styles.graphZone}>
         <div className={styles.rightMenu}>
-          <button onClick={handleAddNodes}>Добавить ноду</button>
+          <button onClick={handleAddNodes}>Добавить вершину</button>
           <button onClick={handleAddEdges}>Добавить ребро</button>
           <button onClick={handleFindRoute}>Дейкстра</button>
           <button onClick={handleFindMinOst}>Краскал</button>
