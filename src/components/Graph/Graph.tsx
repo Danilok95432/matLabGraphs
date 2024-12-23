@@ -3,7 +3,6 @@ import type { Edge } from "../../types/Edge";
 import type { NodeType } from "../../types/Node";
 import { Node } from "../Node/Node";
 
-import styles from "./index.module.scss";
 import { useActions } from "../../hooks/actions/actions";
 import { dijkstra } from "../../heplers/dijkstra";
 import { useSelector } from "react-redux";
@@ -11,19 +10,47 @@ import { RootState } from "../../store/store";
 import { Switcher } from "../Switcher/Switcher";
 import { kruskal } from "../../heplers/kruskal";
 
+import styles from "./index.module.scss";
+
 type GraphProps = {
   initialNodes: NodeType[];
   initialEdges: Edge[];
 };
 
 export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
+
   const { addNode, addEdge, setResult, setResultKraskal, changeDirection } = useActions()
   const result = useSelector((state: RootState) => state.graph.result)
   const resultKruskal = useSelector((state: RootState) => state.graph.resultKruskal)
   const isDirected = useSelector((state: RootState) => state.graph.isDirected)
 
+  const validateTextPrompt = (promptMessage: string, addingEdge?: boolean) => {
+    let input: string | null = null;
+    while (true) {
+      input = prompt(promptMessage);
+
+      if (!input) {
+        alert("Ввод не может быть пустым. Пожалуйста, попробуйте еще раз.");
+        continue;
+      }
+
+      const isValid = /^[a-zA-Zа-яА-Я]+$/.test(input);
+      if (!isValid) {
+        alert("Ввод должен содержать только буквы. Пожалуйста, попробуйте еще раз.");
+        continue;
+      }
+
+      if(initialNodes.filter((node) => node.title === input).length == 0 && addingEdge) {
+        alert("Вершина должна быть существующей. Пожалуйста, попробуйте еще раз.");
+        continue;
+      }
+
+      return input;
+    }
+  }
+
   const handleAddNodes = () => {
-    const title = prompt("Введите название новой вершины:");
+    const title = validateTextPrompt("Введите название новой вершины:")
     if (title) {
       const newNode: NodeType = {
         id: Date.now().toString(),
@@ -39,13 +66,13 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
   }
 
   const handleAddEdges = () => {
-    const source = prompt("Введите имя начальной вершины:");
-    const target = prompt("Введите имя конечной вершины:");
+    const source = validateTextPrompt("Введите имя начальной вершины:", true)
+    const target = validateTextPrompt("Введите имя конечной вершины:", true)
     const weightStr = prompt("Введите вес ребра:");
 
     if (source && target && weightStr) {
       const weight = parseFloat(weightStr);
-      if (!isNaN(weight)) {
+      if (!isNaN(weight) && weight > 0) {
         const newEdge: Edge = {
           id: Date.now().toString(),
           source,
@@ -54,7 +81,7 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
         };
         addEdge(newEdge);
       } else {
-        alert("Вес должен быть числом.");
+        alert("Вес должен быть неотрицательным числом.");
       }
     }
   }
@@ -73,6 +100,13 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
 
   const handleSwitchChange = (value: boolean) => {
     changeDirection(value)
+  }
+
+  const handleDirect = (edge: Edge) => {
+    if(isDirected){
+      return `${edge.weight}( ${edge.source} -> ${edge.target} )`
+    }
+    else return edge.weight
   }
 
   return (
@@ -159,12 +193,13 @@ export const Graph: FC<GraphProps> = ({ initialNodes, initialEdges }) => {
                   className={styles.weight}
                   style={{
                     position: "absolute",
+                    width: "90px",
                     left: (x1 + x2) / 2 + 45,
                     top: (y1 + y2) / 2,
                     transform: "translate(-50%, -50%)",
                   }}
                 >
-                  {edge.weight}
+                  {handleDirect(edge)}
                 </div>
               </div>
             );
